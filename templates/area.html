@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tablica {{ area_id }}</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+  </head>
+  <body>
+    <h1>Współdzielona textarea dla {{ area_id }}</h1>
+    <textarea id="shared-textarea" rows="10" cols="50"></textarea>
+
+    <script>
+      const socket = io({ query: { area_id: "{{ area_id }}" } });
+      const areaId = "{{ area_id }}";
+
+      socket.on("update_text", function (msg) {
+        if (msg.area_id === areaId) {
+          document.getElementById("shared-textarea").value = msg.text;
+        }
+      });
+
+      document
+        .getElementById("shared-textarea")
+        .addEventListener("input", function () {
+          socket.emit("text_update", { area_id: areaId, text: this.value });
+        });
+    </script>
+  </body>
+</html>
